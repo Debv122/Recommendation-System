@@ -1,31 +1,31 @@
-# 🚀 Recommendation System for getINNOtized
+#   Recommendation System for getINNOtized
 
-## 📋 Project Overview
+##  Project Overview
 
 A comprehensive, production-ready recommendation system that leverages advanced machine learning algorithms to provide personalized product recommendations based on user behavior patterns, item properties, and collaborative filtering techniques.
 
-## ✨ Key Features
+##  Key Features
 
-### 🎯 **Multi-Algorithm Approach**
+###  **Multi-Algorithm Approach**
 - **Collaborative Filtering**: User-based similarity recommendations
 - **Content-Based Filtering**: Item property-based recommendations  
 - **Matrix Factorization**: SVD-based latent factor modeling
 - **Hybrid Recommendations**: Intelligent combination of multiple approaches
 - **Popularity-Based**: Fallback recommendations for new users
 
-### 🔍 **Advanced Analytics**
+###  **Advanced Analytics**
 - **User Behavior Analysis**: View-to-cart conversion tracking
 - **Temporal Pattern Analysis**: Hourly/daily activity insights
 - **Anomaly Detection**: Identification of abnormal user behavior
 - **Performance Evaluation**: Precision, Recall, F1-score metrics
 
-### 🛠 **Technical Capabilities**
+###  **Technical Capabilities**
 - **Scalable Architecture**: Memory-efficient processing for large datasets
 - **Real-time Processing**: Dynamic recommendation generation
 - **Fallback Mechanisms**: Robust error handling and backup strategies
 - **Configurable Parameters**: Environment variable-based tuning
 
-## 🏗 System Architecture
+##  System Architecture
 
 ```
 ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
@@ -39,7 +39,7 @@ A comprehensive, production-ready recommendation system that leverages advanced 
                        └──────────────────┘
 ```
 
-## 📊 Data Processing Pipeline
+##  Data Processing Pipeline
 
 1. **Data Loading & Cleaning**
    - Automatic detection of cleaned datasets
@@ -56,7 +56,7 @@ A comprehensive, production-ready recommendation system that leverages advanced 
    - Real-time similarity calculations
    - Hybrid scoring and ranking
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### Prerequisites
 ```bash
@@ -85,7 +85,7 @@ recommendations = rs.hybrid_recommendations(user_id="12345", n_recommendations=5
 streamlit run streamlit_app.py
 ```
 
-## 📈 Performance Metrics
+##  Performance Metrics
 
 The system provides comprehensive evaluation metrics:
 
@@ -95,7 +95,7 @@ The system provides comprehensive evaluation metrics:
 - **Hit Rate@N**: Fraction of users with relevant recommendations
 - **Conversion Rate Analysis**: View-to-cart behavior insights
 
-## 🔧 Configuration
+##  Configuration
 
 Environment variables for tuning system performance:
 
@@ -108,7 +108,7 @@ COLLAB_SIMILAR_USERS=10        # Number of similar users
 N_TEST_USERS=100               # Users for evaluation
 ```
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 Recommendation System/
@@ -123,7 +123,7 @@ Recommendation System/
     └── category_tree_cleaned.csv    # Product categories
 ```
 
-## 🎯 Use Cases
+##  Use Cases
 
 ### E-commerce Applications
 - **Product Recommendations**: "Customers who viewed this also viewed..."
@@ -160,7 +160,7 @@ Recommendation System/
 - **Similarity Matrices**: Pre-computed item/user similarities
 - **Feature Vectors**: One-hot encoded item properties
 
-## 📊 Evaluation Results
+##  Evaluation Results
 
 The system achieves:
 - **High Precision**: Accurate recommendation targeting
@@ -168,7 +168,7 @@ The system achieves:
 - **Robust Performance**: Consistent results across user segments
 - **Scalable Processing**: Handles large-scale datasets efficiently
 
-## 🚀 Future Enhancements
+##  Future Enhancements
 
 - **Deep Learning Integration**: Neural collaborative filtering
 - **Real-time Updates**: Streaming recommendation updates
@@ -176,22 +176,6 @@ The system achieves:
 - **Multi-modal Features**: Image and text-based recommendations
 - **Contextual Recommendations**: Time and location-aware suggestions
 
-## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Implement your changes
-4. Add comprehensive tests
-5. Submit a pull request
 
-## 📄 License
 
-This project is developed for getINNOtized and is proprietary software.
-
-## 📞 Support
-
-For technical support or questions about the recommendation system, please contact the development team.
-
----
-
-**Built with ❤️ for getINNOtized - Transforming E-commerce through Intelligent Recommendations**
