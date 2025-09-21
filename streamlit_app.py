@@ -65,9 +65,8 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-@st.cache_data
 def load_recommendation_system():
-    """Load and initialize the recommendation system with caching"""
+    """Load and initialize the recommendation system"""
     try:
         rs = RecommendationSystem()
         rs.load_data()
@@ -77,14 +76,12 @@ def load_recommendation_system():
         st.error(f"Error loading recommendation system: {str(e)}")
         return None
 
-@st.cache_data
 def get_available_users(rs):
     """Get list of available users for recommendations"""
     if rs and rs.user_item_matrix is not None:
         return rs.user_item_matrix.index.tolist()
     return []
 
-@st.cache_data
 def get_system_stats(rs):
     """Get system statistics"""
     if not rs:
@@ -148,63 +145,68 @@ def create_analytics_dashboard(rs):
         st.warning("No data available for analytics.")
         return
     
-    # Event distribution
-    st.subheader("Event Distribution")
-    event_counts = rs.events_df['event'].value_counts()
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        fig = px.pie(values=event_counts.values, names=event_counts.index, 
-                     title="Event Type Distribution")
+    try:
+        # Event distribution
+        st.subheader("Event Distribution")
+        event_counts = rs.events_df['event'].value_counts()
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            fig = px.pie(values=event_counts.values, names=event_counts.index, 
+                         title="Event Type Distribution")
+            st.plotly_chart(fig, use_container_width=True)
+        
+        with col2:
+            fig = px.bar(x=event_counts.index, y=event_counts.values,
+                         title="Event Counts by Type")
+            st.plotly_chart(fig, use_container_width=True)
+        
+        # Temporal analysis
+        st.subheader("Temporal Analysis")
+        
+        # Hourly activity
+        rs.events_df['hour'] = rs.events_df['timestamp'].dt.hour
+        hourly_activity = rs.events_df.groupby('hour').size()
+        
+        fig = px.line(x=hourly_activity.index, y=hourly_activity.values,
+                      title="Activity by Hour of Day",
+                      labels={'x': 'Hour', 'y': 'Number of Events'})
         st.plotly_chart(fig, use_container_width=True)
-    
-    with col2:
-        fig = px.bar(x=event_counts.index, y=event_counts.values,
-                     title="Event Counts by Type")
+        
+        # Daily activity
+        rs.events_df['day_of_week'] = rs.events_df['timestamp'].dt.day_name()
+        daily_activity = rs.events_df.groupby('day_of_week').size()
+        
+        fig = px.bar(x=daily_activity.index, y=daily_activity.values,
+                     title="Activity by Day of Week")
         st.plotly_chart(fig, use_container_width=True)
-    
-    # Temporal analysis
-    st.subheader("Temporal Analysis")
-    
-    # Hourly activity
-    rs.events_df['hour'] = rs.events_df['timestamp'].dt.hour
-    hourly_activity = rs.events_df.groupby('hour').size()
-    
-    fig = px.line(x=hourly_activity.index, y=hourly_activity.values,
-                  title="Activity by Hour of Day",
-                  labels={'x': 'Hour', 'y': 'Number of Events'})
-    st.plotly_chart(fig, use_container_width=True)
-    
-    # Daily activity
-    rs.events_df['day_of_week'] = rs.events_df['timestamp'].dt.day_name()
-    daily_activity = rs.events_df.groupby('day_of_week').size()
-    
-    fig = px.bar(x=daily_activity.index, y=daily_activity.values,
-                 title="Activity by Day of Week")
-    st.plotly_chart(fig, use_container_width=True)
-    
-    # User activity analysis
-    st.subheader("User Activity Analysis")
-    user_activity = rs.events_df.groupby('visitorid').size()
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.metric("Average Events per User", f"{user_activity.mean():.1f}")
-        st.metric("Median Events per User", f"{user_activity.median():.1f}")
-    
-    with col2:
-        st.metric("Most Active User", f"{user_activity.idxmax()}")
-        st.metric("Max Events by User", f"{user_activity.max()}")
-    
-    # Item popularity
-    st.subheader("Item Popularity")
-    item_popularity = rs.events_df[rs.events_df['event'] == 'view']['itemid'].value_counts().head(20)
-    
-    fig = px.bar(x=item_popularity.values, y=item_popularity.index,
-                 orientation='h', title="Top 20 Most Viewed Items")
-    st.plotly_chart(fig, use_container_width=True)
+        
+        # User activity analysis
+        st.subheader("User Activity Analysis")
+        user_activity = rs.events_df.groupby('visitorid').size()
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.metric("Average Events per User", f"{user_activity.mean():.1f}")
+            st.metric("Median Events per User", f"{user_activity.median():.1f}")
+        
+        with col2:
+            st.metric("Most Active User", f"{user_activity.idxmax()}")
+            st.metric("Max Events by User", f"{user_activity.max()}")
+        
+        # Item popularity
+        st.subheader("Item Popularity")
+        item_popularity = rs.events_df[rs.events_df['event'] == 'view']['itemid'].value_counts().head(20)
+        
+        fig = px.bar(x=item_popularity.values, y=item_popularity.index,
+                     orientation='h', title="Top 20 Most Viewed Items")
+        st.plotly_chart(fig, use_container_width=True)
+        
+    except Exception as e:
+        st.error(f"Error creating analytics dashboard: {str(e)}")
+        st.info("Some visualizations may not be available due to data limitations.")
 
 def main():
     """Main Streamlit application"""
@@ -219,11 +221,23 @@ def main():
         ["🏠 Home", "🎯 Recommendations", "📊 Analytics", "⚙️ System Status", "🔧 Data Management"]
     )
     
+    # Add cache clearing option in sidebar
+    st.sidebar.markdown("---")
+    if st.sidebar.button("🗑️ Clear Cache & Reload"):
+        # Clear session state
+        for key in list(st.session_state.keys()):
+            del st.session_state[key]
+        st.rerun()
+    
     # Initialize session state
     if 'rs' not in st.session_state:
         st.session_state.rs = None
     if 'data_loaded' not in st.session_state:
         st.session_state.data_loaded = False
+    if 'system_stats' not in st.session_state:
+        st.session_state.system_stats = {}
+    if 'available_users' not in st.session_state:
+        st.session_state.available_users = []
     
     # Home page
     if page == "🏠 Home":
@@ -248,15 +262,21 @@ def main():
         # Quick stats
         if st.button("🔄 Load System Data", type="primary"):
             with st.spinner("Loading recommendation system..."):
-                st.session_state.rs = load_recommendation_system()
-                if st.session_state.rs:
-                    st.session_state.data_loaded = True
-                    st.success("✅ System loaded successfully!")
-                else:
-                    st.error("❌ Failed to load system data.")
+                try:
+                    st.session_state.rs = load_recommendation_system()
+                    if st.session_state.rs:
+                        st.session_state.data_loaded = True
+                        # Update cached data
+                        st.session_state.system_stats = get_system_stats(st.session_state.rs)
+                        st.session_state.available_users = get_available_users(st.session_state.rs)
+                        st.success("✅ System loaded successfully!")
+                    else:
+                        st.error("❌ Failed to load system data.")
+                except Exception as e:
+                    st.error(f"❌ Error loading system: {str(e)}")
         
         if st.session_state.data_loaded and st.session_state.rs:
-            stats = get_system_stats(st.session_state.rs)
+            stats = st.session_state.system_stats
             
             st.subheader("📈 System Overview")
             col1, col2, col3, col4 = st.columns(4)
@@ -282,7 +302,7 @@ def main():
         
         # User selection
         st.subheader("Select User")
-        available_users = get_available_users(rs)
+        available_users = st.session_state.available_users
         
         if not available_users:
             st.error("No users available in the system.")
@@ -364,7 +384,7 @@ def main():
             st.success("✅ System is loaded and ready!")
             
             # System statistics
-            stats = get_system_stats(st.session_state.rs)
+            stats = st.session_state.system_stats
             
             st.subheader("📊 System Statistics")
             
